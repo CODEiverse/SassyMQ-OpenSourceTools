@@ -1,0 +1,90 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003" ToolsVersion="4.0">
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <SchemaVersion>2.0</SchemaVersion>
+    <ProjectGuid>2862cb69-e7ed-423f-90cd-ea553bbd702c</ProjectGuid>
+    <ProjectHome>.</ProjectHome>
+    <StartupFile>PySassyMQ.py</StartupFile>
+    <SearchPath>
+    </SearchPath>
+    <WorkingDirectory>.</WorkingDirectory>
+    <OutputPath>.</OutputPath>
+    <Name>PySassyMQ</Name>
+    <RootNamespace>PySassyMQ</RootNamespace>
+    <IsWindowsApplication>True</IsWindowsApplication>
+    <LaunchProvider>Standard Python launcher</LaunchProvider>
+    <EnableNativeCodeDebugging>False</EnableNativeCodeDebugging>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)' == 'Debug' ">
+    <DebugSymbols>true</DebugSymbols>
+    <EnableUnmanagedDebugging>false</EnableUnmanagedDebugging>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)' == 'Release' ">
+    <DebugSymbols>true</DebugSymbols>
+    <EnableUnmanagedDebugging>false</EnableUnmanagedDebugging>
+  </PropertyGroup>
+  <ItemGroup>
+    <Compile Include="PySassyMQ.py" />
+    <Compile Include="SassyMQ\CommonClasses\BaseClasses.py" />
+    <Compile Include="SassyMQ\CommonClasses\Extentions.py" />
+    <Compile Include="SassyMQ\CommonClasses\InvokeEventArgs.py" />
+    <Compile Include="SassyMQ\CommonClasses\LexiconTerm.py" />
+    <Compile Include="SassyMQ\CommonClasses\PayloadEventArgs.py" />
+    <Compile Include="SassyMQ\CommonClasses\SMQActorBase.py" />
+    <Compile Include="SassyMQ\CommonClasses\StandardPayload.py" />
+    <Compile Include="SassyMQ\CommonClasses\__init__.py" />
+    <Compile Include="SassyMQ\pika\adapters\base_connection.py" />
+    <Compile Include="SassyMQ\pika\adapters\blocking_connection.py" />
+    <Compile Include="SassyMQ\pika\adapters\libev_connection.py" />
+    <Compile Include="SassyMQ\pika\adapters\select_connection.py" />
+    <Compile Include="SassyMQ\pika\adapters\tornado_connection.py" />
+    <Compile Include="SassyMQ\pika\adapters\twisted_connection.py" />
+    <Compile Include="SassyMQ\pika\adapters\__init__.py" />
+    <Compile Include="SassyMQ\pika\amqp_object.py" />
+    <Compile Include="SassyMQ\pika\callback.py" />
+    <Compile Include="SassyMQ\pika\channel.py" />
+    <Compile Include="SassyMQ\pika\compat.py" />
+    <Compile Include="SassyMQ\pika\connection.py" />
+    <Compile Include="SassyMQ\pika\credentials.py" />
+    <Compile Include="SassyMQ\pika\data.py" />
+    <Compile Include="SassyMQ\pika\exceptions.py" />
+    <Compile Include="SassyMQ\pika\frame.py" />
+    <Compile Include="SassyMQ\pika\heartbeat.py" />
+    <Compile Include="SassyMQ\pika\spec.py" />
+    <Compile Include="SassyMQ\pika\utils.py" />
+    <Compile Include="SassyMQ\pika\__init__.py" />
+    <Compile Include="SassyMQ\SMQActors\SMQHost.py" />
+    <Compile Include="SassyMQ\SMQActors\SMQHostBase.py" />
+    <Compile Include="SassyMQ\SMQActors\SMQOwner.py" />
+    <Compile Include="SassyMQ\SMQActors\SMQOwnerBase.py" />
+    <Compile Include="SassyMQ\SMQActors\SMQPublic.py" />
+    <Compile Include="SassyMQ\SMQActors\SMQPublicBase.py" />
+    <Compile Include="SassyMQ\SMQActors\__init__.py" />
+    <Compile Include="SassyMQ\__init__.py" />
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="SassyMQ\" />
+    <Folder Include="SassyMQ\CommonClasses\" />
+    <Folder Include="SassyMQ\pika\" />
+    <Folder Include="SassyMQ\pika\adapters\" />
+    <Folder Include="SassyMQ\SMQActors\" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="requirements.txt" />
+  </ItemGroup>
+  <PropertyGroup>
+    <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">10.0</VisualStudioVersion>
+    <PtvsTargetsFile>$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)\Python Tools\Microsoft.PythonTools.targets</PtvsTargetsFile>
+  </PropertyGroup>
+  <Import Condition="Exists($(PtvsTargetsFile))" Project="$(PtvsTargetsFile)" />
+  <Import Condition="!Exists($(PtvsTargetsFile))" Project="$(MSBuildToolsPath)\Microsoft.Common.targets" />
+  <!-- Uncomment the CoreCompile target to enable the Build command in
+       Visual Studio and specify your pre- and post-build commands in
+       the BeforeBuild and AfterBuild targets below. -->
+  <!--<Target Name="CoreCompile" />-->
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+</Project>

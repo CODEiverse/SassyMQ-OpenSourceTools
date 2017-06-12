@@ -1,0 +1,41 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 14
+VisualStudioVersion = 14.0.25420.1
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SassyMQ.Lib", "Microsoft\Lib\SassyMQ.Lib.csproj", "{44106808-2B9A-497B-B8D4-F6C0C236C78C}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SassyMQ.ConApp", "Microsoft\ConApp\SassyMQ.ConApp.csproj", "{D58A30DA-82B7-4E0A-AC5A-63417FE8406F}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Microsoft", "Microsoft", "{1040DB80-04FB-441A-9F18-06FD931BE595}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Python", "Python", "{0FF23E98-3BE6-4A36-AFC4-95EF908DF867}"
+EndProject
+Project("{888888A0-9F3D-457C-B088-3A5042F75D52}") = "PySassyMQ", "PySassyMQ\PySassyMQ.pyproj", "{2862CB69-E7ED-423F-90CD-EA553BBD702C}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{44106808-2B9A-497B-B8D4-F6C0C236C78C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{44106808-2B9A-497B-B8D4-F6C0C236C78C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{44106808-2B9A-497B-B8D4-F6C0C236C78C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{44106808-2B9A-497B-B8D4-F6C0C236C78C}.Release|Any CPU.Build.0 = Release|Any CPU
+		{D58A30DA-82B7-4E0A-AC5A-63417FE8406F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D58A30DA-82B7-4E0A-AC5A-63417FE8406F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D58A30DA-82B7-4E0A-AC5A-63417FE8406F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D58A30DA-82B7-4E0A-AC5A-63417FE8406F}.Release|Any CPU.Build.0 = Release|Any CPU
+		{2862CB69-E7ED-423F-90CD-EA553BBD702C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{2862CB69-E7ED-423F-90CD-EA553BBD702C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{44106808-2B9A-497B-B8D4-F6C0C236C78C} = {1040DB80-04FB-441A-9F18-06FD931BE595}
+		{D58A30DA-82B7-4E0A-AC5A-63417FE8406F} = {1040DB80-04FB-441A-9F18-06FD931BE595}
+		{2862CB69-E7ED-423F-90CD-EA553BBD702C} = {0FF23E98-3BE6-4A36-AFC4-95EF908DF867}
+	EndGlobalSection
+EndGlobal
