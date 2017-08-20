@@ -2,154 +2,117 @@
 <FileSet xmlns:xs="http://www.w3.org/2001/XMLSchema">
 <FileSetFiles>
 <FileSetFile>
-<RelativePath>LexiconEnum.py</RelativePath>
+<RelativePath>SassyMQ/OSTL/LexiconEnum.py</RelativePath>
 <OverwriteMode>Always</OverwriteMode>
-<FileContents>using System;
-using System.Linq;
-using System.Collections.Generic;
-using System.Collections;
-
-namespace SassyMQ.Lib.RabbitMQ
-{
-    public enum LexiconTermEnum
-    {
-        owner_getfile_host, 
-        owner_getfiles_host, 
-        owner_getmoduleinitfileset_host, 
-        owner_getsdk_host, 
-        owner_rebuildsdk_host, 
-        owner_setsource_host, 
-        owner_takeownership_host, 
-        public_createsmqproject_host
-    }
-}</FileContents>
-</FileSetFile>
+<FileContents>"""
+class LexiconTermEnum
+    owner_getfile_host = 'owner_getfile_host'
+    owner_getfiles_host = 'owner_getfiles_host'
+    owner_getmoduleinitfileset_host = 'owner_getmoduleinitfileset_host'
+    owner_getsdk_host = 'owner_getsdk_host'
+    owner_rebuildsdk_host = 'owner_rebuildsdk_host'
+    owner_setsource_host = 'owner_setsource_host'
+    owner_takeownership_host = 'owner_takeownership_host'
+    public_createsmqproject_host = 'public_createsmqproject_host'
+   
+</FileContents>"""
+                </FileSetFile>
 <FileSetFile>
-<RelativePath>LexiconTermsBase.py</RelativePath>
+<RelativePath>SassyMQ/OSTL/LexiconBase.py</RelativePath>
 <OverwriteMode>Always</OverwriteMode>
-<FileContents>using System;
+<FileContents>from SassyMQ.OSTL.CommonClasses.LexiconTerm import *
 
-using System.Linq;
-using System.Collections.Generic;
-using System.Collections;
+class LexiconBase(object):
+    Terms = []
+    TermsByRoutingKey = {}
+    TermsByVerb = {}
 
-namespace SassyMQ.Lib.RabbitMQ
-{
-    public partial class Lexicon
-    {
-        public static Lexicon Terms = new Lexicon();
-        protected static new Dictionary&lt;LexiconTermEnum, LexiconTerm&gt; TermsByKey { get; set; }
-
-        public LexiconTerm this[LexiconTermEnum termKey]
-        {
-            get { return TermsByKey[termKey]; }
-        }
-
-        public LexiconTerm FromRoutingKey(string routingKey)
-        {
-            return Lexicon.TermsByKey.Values.FirstOrDefault(first =&gt; first.RoutingKey == routingKey);
-        }
+    @staticmethod
+    def pushTerm(term):
+        LexiconBase.Terms.append(term)
+        LexiconBase.TermsByRoutingKey[term.RoutingKey] = term
+        LexiconBase.TermsByVerb[term.Verb] = term
 
 
-        public IEnumerator&lt;LexiconTerm&gt; GetEnumerator()
-        {
-            return Lexicon.TermsByKey.Values.GetEnumerator();
-        }
+LexiconBase.pushTerm(LexiconTerm(term = "public_createsmqproject_host",
+                                 routingKey = "host.general.public.createsmqproject",
+                                 sender = "public",
+                                 verb = "createsmqproject",
+                                 receiver = "host",
+                                 category = "general"))
 
-        static Lexicon()
-        {
-            Lexicon.TermsByKey = new Dictionary&lt;LexiconTermEnum, LexiconTerm&gt;();
-            
-            Lexicon.TermsByKey[LexiconTermEnum.public_createsmqproject_host] = new LexiconTerm() {
-                Term = LexiconTermEnum.public_createsmqproject_host,
-                Sender = "public",
-                Verb = "createsmqproject",
-                Receiver = "host",
-                Category = "general"
-            };
-            
-            Lexicon.TermsByKey[LexiconTermEnum.owner_takeownership_host] = new LexiconTerm() {
-                Term = LexiconTermEnum.owner_takeownership_host,
-                Sender = "owner",
-                Verb = "takeownership",
-                Receiver = "host",
-                Category = "general"
-            };
-            
-            Lexicon.TermsByKey[LexiconTermEnum.owner_setsource_host] = new LexiconTerm() {
-                Term = LexiconTermEnum.owner_setsource_host,
-                Sender = "owner",
-                Verb = "setsource",
-                Receiver = "host",
-                Category = "general"
-            };
-            
-            Lexicon.TermsByKey[LexiconTermEnum.owner_getsdk_host] = new LexiconTerm() {
-                Term = LexiconTermEnum.owner_getsdk_host,
-                Sender = "owner",
-                Verb = "getsdk",
-                Receiver = "host",
-                Category = "general"
-            };
-            
-            Lexicon.TermsByKey[LexiconTermEnum.owner_rebuildsdk_host] = new LexiconTerm() {
-                Term = LexiconTermEnum.owner_rebuildsdk_host,
-                Sender = "owner",
-                Verb = "rebuildsdk",
-                Receiver = "host",
-                Category = "general"
-            };
-            
-            Lexicon.TermsByKey[LexiconTermEnum.owner_getfiles_host] = new LexiconTerm() {
-                Term = LexiconTermEnum.owner_getfiles_host,
-                Sender = "owner",
-                Verb = "getfiles",
-                Receiver = "host",
-                Category = "general"
-            };
-            
-            Lexicon.TermsByKey[LexiconTermEnum.owner_getfile_host] = new LexiconTerm() {
-                Term = LexiconTermEnum.owner_getfile_host,
-                Sender = "owner",
-                Verb = "getfile",
-                Receiver = "host",
-                Category = "general"
-            };
-            
-            Lexicon.TermsByKey[LexiconTermEnum.owner_getmoduleinitfileset_host] = new LexiconTerm() {
-                Term = LexiconTermEnum.owner_getmoduleinitfileset_host,
-                Sender = "owner",
-                Verb = "getmoduleinitfileset",
-                Receiver = "host",
-                Category = "general"
-            };
-            
-        }
-    }
-}</FileContents>
-</FileSetFile>
-<FileSetFile>
-<RelativePath>LexiconTerms.py</RelativePath>
-<OverwriteMode>Always</OverwriteMode>
-<FileContents>using System;
-using System.Linq;
-using System.Collections.Generic;
+LexiconBase.pushTerm(LexiconTerm(term = "owner_takeownership_host",
+                                 routingKey = "host.general.owner.takeownership",
+                                 sender = "owner",
+                                 verb = "takeownership",
+                                 receiver = "host",
+                                 category = "general"))
 
-namespace SassyMQ.Lib.RabbitMQ 
-{
-    public static partial class LexiconTerms 
-    {
-    }
+LexiconBase.pushTerm(LexiconTerm(term = "owner_setsource_host",
+                                 routingKey = "host.general.owner.setsource",
+                                 sender = "owner",
+                                 verb = "setsource",
+                                 receiver = "host",
+                                 category = "general"))
+
+LexiconBase.pushTerm(LexiconTerm(term = "owner_getsdk_host",
+                                 routingKey = "host.general.owner.getsdk",
+                                 sender = "owner",
+                                 verb = "getsdk",
+                                 receiver = "host",
+                                 category = "general"))
+
+LexiconBase.pushTerm(LexiconTerm(term = "owner_rebuildsdk_host",
+                                 routingKey = "host.general.owner.rebuildsdk",
+                                 sender = "owner",
+                                 verb = "rebuildsdk",
+                                 receiver = "host",
+                                 category = "general"))
+
+LexiconBase.pushTerm(LexiconTerm(term = "owner_getfiles_host",
+                                 routingKey = "host.general.owner.getfiles",
+                                 sender = "owner",
+                                 verb = "getfiles",
+                                 receiver = "host",
+                                 category = "general"))
+
+LexiconBase.pushTerm(LexiconTerm(term = "owner_getfile_host",
+                                 routingKey = "host.general.owner.getfile",
+                                 sender = "owner",
+                                 verb = "getfile",
+                                 receiver = "host",
+                                 category = "general"))
+
+LexiconBase.pushTerm(LexiconTerm(term = "owner_getmoduleinitfileset_host",
+                                 routingKey = "host.general.owner.getmoduleinitfileset",
+                                 sender = "owner",
+                                 verb = "getmoduleinitfileset",
+                                 receiver = "host",
+                                 category = "general"))
+
+
+
 </FileContents>
 </FileSetFile>
 <FileSetFile>
-<RelativePath>SMQActors/SMQPublicBase.py</RelativePath>
-<OverwriteMode>Always</OverwriteMode>
-<FileContents>
-from SassyMQ.CommonClasses.BaseClasses import *
-from SassyMQ.CommonClasses.SMQActorBase import *
-from json import JSONEncoder
+<RelativePath>SassyMQ/OSTL/Lexicon.py</RelativePath>
+<OverwriteMode>Never</OverwriteMode>
+<FileContents>from SassyMQ.OSTL.LexiconBase import *
 
+class Lexicon(LexiconBase):
+    pass
+
+</FileContents>
+</FileSetFile>
+<FileSetFile>
+<RelativePath>SassyMQ/OSTL/SMQActors/SMQPublicBase.py</RelativePath>
+<OverwriteMode>Always</OverwriteMode>
+<FileContents>from SassyMQ.OSTL.Lexicon import *
+from SassyMQ.OSTL.CommonClasses.BaseClasses import *
+from SassyMQ.OSTL.CommonClasses.SMQActorBase import *
+from json import JSONEncoder
+import sys
+import traceback
 
 class SMQPublicBase(SMQActorBase):
      
@@ -157,14 +120,11 @@ class SMQPublicBase(SMQActorBase):
         super(SMQPublicBase, self).__init__("public.all", isAutoConnect)
         
 
-
-
-
-
-      
-
-    # OpenSourceToolsLexicon - OSTL
+    # "OpenSourceTools" - OSTL
     def CheckRouting(self, message_frame, header_frame, body):
+        payload = self.PayloadFromMsg(message_frame, header_frame, body)
+        print("CHECKING: " + message_frame.routing_key)
+
     
 
 
@@ -184,45 +144,47 @@ class SMQPublicBase(SMQActorBase):
         if self.IsDebugMode:
             print("Create S M Q Project - ")
             print("payload: " + payload)
-            
-        self.RMQChannel.basic_publish(exchange='publicmic', routing_key='host.general.public.createsmqproject',  body=payload.toJSON())
+        
+        term = payload.LexiconTerm = Lexicon.TermsByRoutingKey['host.general.public.createsmqproject'];
+        self.RMQChannel.basic_publish(exchange=term.Sender + 'mic', routing_key=term.RoutingKey,  body=payload.toJSON())            
+
     
 
                     </FileContents>
 </FileSetFile>
 <FileSetFile>
-<RelativePath>SMQActors/SMQPublic.py</RelativePath>
+<RelativePath>SassyMQ/OSTL/SMQActors/SMQPublic.py</RelativePath>
 <OverwriteMode>Always</OverwriteMode>
 <FileContents>
-from SMQPublicBase import *
+from SassyMQ.OSTL.SMQActors.SMQPublicBase import *
 
 class SMQPublic(SMQPublicBase):
     pass
                     </FileContents>
 </FileSetFile>
 <FileSetFile>
-<RelativePath>SMQActors/SMQOwnerBase.py</RelativePath>
+<RelativePath>SassyMQ/OSTL/SMQActors/SMQOwnerBase.py</RelativePath>
 <OverwriteMode>Always</OverwriteMode>
-<FileContents>
-from SassyMQ.CommonClasses.BaseClasses import *
-from SassyMQ.CommonClasses.SMQActorBase import *
+<FileContents>from SassyMQ.OSTL.Lexicon import *
+from SassyMQ.OSTL.CommonClasses.BaseClasses import *
+from SassyMQ.OSTL.CommonClasses.SMQActorBase import *
 from json import JSONEncoder
-
+import sys
+import traceback
 
 class SMQOwnerBase(SMQActorBase):
      
     def __init__(self, isAutoConnect = True):
         super(SMQOwnerBase, self).__init__("owner.all", isAutoConnect)
         
+        # And can also say/hear everything which : Public hears.
+            
 
-
-
-
-
-      
-
-    # OpenSourceToolsLexicon - OSTL
+    # "OpenSourceTools" - OSTL
     def CheckRouting(self, message_frame, header_frame, body):
+        payload = self.PayloadFromMsg(message_frame, header_frame, body)
+        print("CHECKING: " + message_frame.routing_key)
+
     
             # And can also hear everything which : Public hears.
             
@@ -244,8 +206,10 @@ class SMQOwnerBase(SMQActorBase):
         if self.IsDebugMode:
             print("Take Ownership - ")
             print("payload: " + payload)
-            
-        self.RMQChannel.basic_publish(exchange='ownermic', routing_key='host.general.owner.takeownership',  body=payload.toJSON())
+        
+        term = payload.LexiconTerm = Lexicon.TermsByRoutingKey['host.general.owner.takeownership'];
+        self.RMQChannel.basic_publish(exchange=term.Sender + 'mic', routing_key=term.RoutingKey,  body=payload.toJSON())            
+
     
     def OwnerSetSourceNoPayload(self):
         self.OwnerSetSource(self.CreatePayload())
@@ -261,8 +225,10 @@ class SMQOwnerBase(SMQActorBase):
         if self.IsDebugMode:
             print("Set Source - ")
             print("payload: " + payload)
-            
-        self.RMQChannel.basic_publish(exchange='ownermic', routing_key='host.general.owner.setsource',  body=payload.toJSON())
+        
+        term = payload.LexiconTerm = Lexicon.TermsByRoutingKey['host.general.owner.setsource'];
+        self.RMQChannel.basic_publish(exchange=term.Sender + 'mic', routing_key=term.RoutingKey,  body=payload.toJSON())            
+
     
     def OwnerGetSDKNoPayload(self):
         self.OwnerGetSDK(self.CreatePayload())
@@ -278,8 +244,10 @@ class SMQOwnerBase(SMQActorBase):
         if self.IsDebugMode:
             print("Get S D K - ")
             print("payload: " + payload)
-            
-        self.RMQChannel.basic_publish(exchange='ownermic', routing_key='host.general.owner.getsdk',  body=payload.toJSON())
+        
+        term = payload.LexiconTerm = Lexicon.TermsByRoutingKey['host.general.owner.getsdk'];
+        self.RMQChannel.basic_publish(exchange=term.Sender + 'mic', routing_key=term.RoutingKey,  body=payload.toJSON())            
+
     
     def OwnerRebuildSDKNoPayload(self):
         self.OwnerRebuildSDK(self.CreatePayload())
@@ -295,8 +263,10 @@ class SMQOwnerBase(SMQActorBase):
         if self.IsDebugMode:
             print("Rebuild S D K - ")
             print("payload: " + payload)
-            
-        self.RMQChannel.basic_publish(exchange='ownermic', routing_key='host.general.owner.rebuildsdk',  body=payload.toJSON())
+        
+        term = payload.LexiconTerm = Lexicon.TermsByRoutingKey['host.general.owner.rebuildsdk'];
+        self.RMQChannel.basic_publish(exchange=term.Sender + 'mic', routing_key=term.RoutingKey,  body=payload.toJSON())            
+
     
     def OwnerGetFilesNoPayload(self):
         self.OwnerGetFiles(self.CreatePayload())
@@ -312,8 +282,10 @@ class SMQOwnerBase(SMQActorBase):
         if self.IsDebugMode:
             print("Get Files - ")
             print("payload: " + payload)
-            
-        self.RMQChannel.basic_publish(exchange='ownermic', routing_key='host.general.owner.getfiles',  body=payload.toJSON())
+        
+        term = payload.LexiconTerm = Lexicon.TermsByRoutingKey['host.general.owner.getfiles'];
+        self.RMQChannel.basic_publish(exchange=term.Sender + 'mic', routing_key=term.RoutingKey,  body=payload.toJSON())            
+
     
     def OwnerGetFileNoPayload(self):
         self.OwnerGetFile(self.CreatePayload())
@@ -329,8 +301,10 @@ class SMQOwnerBase(SMQActorBase):
         if self.IsDebugMode:
             print("Get File - ")
             print("payload: " + payload)
-            
-        self.RMQChannel.basic_publish(exchange='ownermic', routing_key='host.general.owner.getfile',  body=payload.toJSON())
+        
+        term = payload.LexiconTerm = Lexicon.TermsByRoutingKey['host.general.owner.getfile'];
+        self.RMQChannel.basic_publish(exchange=term.Sender + 'mic', routing_key=term.RoutingKey,  body=payload.toJSON())            
+
     
     def OwnerGetModuleInitFileSetNoPayload(self):
         self.OwnerGetModuleInitFileSet(self.CreatePayload())
@@ -346,8 +320,10 @@ class SMQOwnerBase(SMQActorBase):
         if self.IsDebugMode:
             print("Get Module Init File Set - ")
             print("payload: " + payload)
-            
-        self.RMQChannel.basic_publish(exchange='ownermic', routing_key='host.general.owner.getmoduleinitfileset',  body=payload.toJSON())
+        
+        term = payload.LexiconTerm = Lexicon.TermsByRoutingKey['host.general.owner.getmoduleinitfileset'];
+        self.RMQChannel.basic_publish(exchange=term.Sender + 'mic', routing_key=term.RoutingKey,  body=payload.toJSON())            
+
     
         # And can also say/hear everything which : Public hears.
         
@@ -365,30 +341,33 @@ class SMQOwnerBase(SMQActorBase):
         if self.IsDebugMode:
             print("Create S M Q Project - ")
             print("payload: " + payload)
-            
-        self.RMQChannel.basic_publish(exchange='publicmic', routing_key='host.general.public.createsmqproject',  body=payload.toJSON())
+        
+        term = payload.LexiconTerm = Lexicon.TermsByRoutingKey['host.general.public.createsmqproject'];
+        self.RMQChannel.basic_publish(exchange=term.Sender + 'mic', routing_key=term.RoutingKey,  body=payload.toJSON())            
+
     
 
                     </FileContents>
 </FileSetFile>
 <FileSetFile>
-<RelativePath>SMQActors/SMQOwner.py</RelativePath>
+<RelativePath>SassyMQ/OSTL/SMQActors/SMQOwner.py</RelativePath>
 <OverwriteMode>Always</OverwriteMode>
 <FileContents>
-from SMQOwnerBase import *
+from SassyMQ.OSTL.SMQActors.SMQOwnerBase import *
 
 class SMQOwner(SMQOwnerBase):
     pass
                     </FileContents>
 </FileSetFile>
 <FileSetFile>
-<RelativePath>SMQActors/SMQHostBase.py</RelativePath>
+<RelativePath>SassyMQ/OSTL/SMQActors/SMQHostBase.py</RelativePath>
 <OverwriteMode>Always</OverwriteMode>
-<FileContents>
-from SassyMQ.CommonClasses.BaseClasses import *
-from SassyMQ.CommonClasses.SMQActorBase import *
+<FileContents>from SassyMQ.OSTL.Lexicon import *
+from SassyMQ.OSTL.CommonClasses.BaseClasses import *
+from SassyMQ.OSTL.CommonClasses.SMQActorBase import *
 from json import JSONEncoder
-
+import sys
+import traceback
 
 class SMQHostBase(SMQActorBase):
      
@@ -411,134 +390,143 @@ class SMQHostBase(SMQActorBase):
         
         self.OwnerGetModuleInitFileSetObservers = []
         
+        # And can also say/hear everything which : Owner hears.
+            
+        # And can also say/hear everything which : Public hears.
+            
 
-
-
-
-
-      
-
-    # OpenSourceToolsLexicon - OSTL
+    # "OpenSourceTools" - OSTL
     def CheckRouting(self, message_frame, header_frame, body):
+        payload = self.PayloadFromMsg(message_frame, header_frame, body)
+        print("CHECKING: " + message_frame.routing_key)
+
     
-      
         if message_frame.routing_key == "host.general.public.createsmqproject":
             if self.IsDebugMode:
                 print("Create S M Q Project -  ")
                 print("payload: " + message_frame)
 
-            for callback in self.PublicCreateSMQProjectObservers:
-                callback(message_frame, header_frame, body)
+            try:
+                for callbackMethod in self.PublicCreateSMQProjectObservers:
+                    payload.IsHandled = True
+                    callbackMethod(payload)
+            except:
+                payload.ErrorMessage = traceback.format_exc(True)
+                print(payload.ErrorMessage)
 
-            if (hasattr(message_frame, "ReplyTo") and message_frame.ReplyTo != ""):
-                payload = self.CreatePaylaod()
-                payload.Content = body;
-                self.RMQChannel.BasicPublish("", message_frame.ReplyTo, body = payload.ToJSonString())
+            payload.sendReply()
 
     
-      
         elif message_frame.routing_key == "host.general.owner.takeownership":
             if self.IsDebugMode:
                 print("Take Ownership -  ")
                 print("payload: " + message_frame)
 
-            for callback in self.OwnerTakeOwnershipObservers:
-                callback(message_frame, header_frame, body)
+            try:
+                for callbackMethod in self.OwnerTakeOwnershipObservers:
+                    payload.IsHandled = True
+                    callbackMethod(payload)
+            except:
+                payload.ErrorMessage = traceback.format_exc(True)
+                print(payload.ErrorMessage)
 
-            if (hasattr(message_frame, "ReplyTo") and message_frame.ReplyTo != ""):
-                payload = self.CreatePaylaod()
-                payload.Content = body;
-                self.RMQChannel.BasicPublish("", message_frame.ReplyTo, body = payload.ToJSonString())
+            payload.sendReply()
 
     
-      
         elif message_frame.routing_key == "host.general.owner.setsource":
             if self.IsDebugMode:
                 print("Set Source -  ")
                 print("payload: " + message_frame)
 
-            for callback in self.OwnerSetSourceObservers:
-                callback(message_frame, header_frame, body)
+            try:
+                for callbackMethod in self.OwnerSetSourceObservers:
+                    payload.IsHandled = True
+                    callbackMethod(payload)
+            except:
+                payload.ErrorMessage = traceback.format_exc(True)
+                print(payload.ErrorMessage)
 
-            if (hasattr(message_frame, "ReplyTo") and message_frame.ReplyTo != ""):
-                payload = self.CreatePaylaod()
-                payload.Content = body;
-                self.RMQChannel.BasicPublish("", message_frame.ReplyTo, body = payload.ToJSonString())
+            payload.sendReply()
 
     
-      
         elif message_frame.routing_key == "host.general.owner.getsdk":
             if self.IsDebugMode:
                 print("Get S D K -  ")
                 print("payload: " + message_frame)
 
-            for callback in self.OwnerGetSDKObservers:
-                callback(message_frame, header_frame, body)
+            try:
+                for callbackMethod in self.OwnerGetSDKObservers:
+                    payload.IsHandled = True
+                    callbackMethod(payload)
+            except:
+                payload.ErrorMessage = traceback.format_exc(True)
+                print(payload.ErrorMessage)
 
-            if (hasattr(message_frame, "ReplyTo") and message_frame.ReplyTo != ""):
-                payload = self.CreatePaylaod()
-                payload.Content = body;
-                self.RMQChannel.BasicPublish("", message_frame.ReplyTo, body = payload.ToJSonString())
+            payload.sendReply()
 
     
-      
         elif message_frame.routing_key == "host.general.owner.rebuildsdk":
             if self.IsDebugMode:
                 print("Rebuild S D K -  ")
                 print("payload: " + message_frame)
 
-            for callback in self.OwnerRebuildSDKObservers:
-                callback(message_frame, header_frame, body)
+            try:
+                for callbackMethod in self.OwnerRebuildSDKObservers:
+                    payload.IsHandled = True
+                    callbackMethod(payload)
+            except:
+                payload.ErrorMessage = traceback.format_exc(True)
+                print(payload.ErrorMessage)
 
-            if (hasattr(message_frame, "ReplyTo") and message_frame.ReplyTo != ""):
-                payload = self.CreatePaylaod()
-                payload.Content = body;
-                self.RMQChannel.BasicPublish("", message_frame.ReplyTo, body = payload.ToJSonString())
+            payload.sendReply()
 
     
-      
         elif message_frame.routing_key == "host.general.owner.getfiles":
             if self.IsDebugMode:
                 print("Get Files -  ")
                 print("payload: " + message_frame)
 
-            for callback in self.OwnerGetFilesObservers:
-                callback(message_frame, header_frame, body)
+            try:
+                for callbackMethod in self.OwnerGetFilesObservers:
+                    payload.IsHandled = True
+                    callbackMethod(payload)
+            except:
+                payload.ErrorMessage = traceback.format_exc(True)
+                print(payload.ErrorMessage)
 
-            if (hasattr(message_frame, "ReplyTo") and message_frame.ReplyTo != ""):
-                payload = self.CreatePaylaod()
-                payload.Content = body;
-                self.RMQChannel.BasicPublish("", message_frame.ReplyTo, body = payload.ToJSonString())
+            payload.sendReply()
 
     
-      
         elif message_frame.routing_key == "host.general.owner.getfile":
             if self.IsDebugMode:
                 print("Get File -  ")
                 print("payload: " + message_frame)
 
-            for callback in self.OwnerGetFileObservers:
-                callback(message_frame, header_frame, body)
+            try:
+                for callbackMethod in self.OwnerGetFileObservers:
+                    payload.IsHandled = True
+                    callbackMethod(payload)
+            except:
+                payload.ErrorMessage = traceback.format_exc(True)
+                print(payload.ErrorMessage)
 
-            if (hasattr(message_frame, "ReplyTo") and message_frame.ReplyTo != ""):
-                payload = self.CreatePaylaod()
-                payload.Content = body;
-                self.RMQChannel.BasicPublish("", message_frame.ReplyTo, body = payload.ToJSonString())
+            payload.sendReply()
 
     
-      
         elif message_frame.routing_key == "host.general.owner.getmoduleinitfileset":
             if self.IsDebugMode:
                 print("Get Module Init File Set -  ")
                 print("payload: " + message_frame)
 
-            for callback in self.OwnerGetModuleInitFileSetObservers:
-                callback(message_frame, header_frame, body)
+            try:
+                for callbackMethod in self.OwnerGetModuleInitFileSetObservers:
+                    payload.IsHandled = True
+                    callbackMethod(payload)
+            except:
+                payload.ErrorMessage = traceback.format_exc(True)
+                print(payload.ErrorMessage)
 
-            if (hasattr(message_frame, "ReplyTo") and message_frame.ReplyTo != ""):
-                payload = self.CreatePaylaod()
-                payload.Content = body;
-                self.RMQChannel.BasicPublish("", message_frame.ReplyTo, body = payload.ToJSonString())
+            payload.sendReply()
 
     
             # And can also hear everything which : Owner hears.
@@ -589,8 +577,10 @@ class SMQHostBase(SMQActorBase):
         if self.IsDebugMode:
             print("Take Ownership - ")
             print("payload: " + payload)
-            
-        self.RMQChannel.basic_publish(exchange='ownermic', routing_key='host.general.owner.takeownership',  body=payload.toJSON())
+        
+        term = payload.LexiconTerm = Lexicon.TermsByRoutingKey['host.general.owner.takeownership'];
+        self.RMQChannel.basic_publish(exchange=term.Sender + 'mic', routing_key=term.RoutingKey,  body=payload.toJSON())            
+
     
     def OwnerSetSourceNoPayload(self):
         self.OwnerSetSource(self.CreatePayload())
@@ -606,8 +596,10 @@ class SMQHostBase(SMQActorBase):
         if self.IsDebugMode:
             print("Set Source - ")
             print("payload: " + payload)
-            
-        self.RMQChannel.basic_publish(exchange='ownermic', routing_key='host.general.owner.setsource',  body=payload.toJSON())
+        
+        term = payload.LexiconTerm = Lexicon.TermsByRoutingKey['host.general.owner.setsource'];
+        self.RMQChannel.basic_publish(exchange=term.Sender + 'mic', routing_key=term.RoutingKey,  body=payload.toJSON())            
+
     
     def OwnerGetSDKNoPayload(self):
         self.OwnerGetSDK(self.CreatePayload())
@@ -623,8 +615,10 @@ class SMQHostBase(SMQActorBase):
         if self.IsDebugMode:
             print("Get S D K - ")
             print("payload: " + payload)
-            
-        self.RMQChannel.basic_publish(exchange='ownermic', routing_key='host.general.owner.getsdk',  body=payload.toJSON())
+        
+        term = payload.LexiconTerm = Lexicon.TermsByRoutingKey['host.general.owner.getsdk'];
+        self.RMQChannel.basic_publish(exchange=term.Sender + 'mic', routing_key=term.RoutingKey,  body=payload.toJSON())            
+
     
     def OwnerRebuildSDKNoPayload(self):
         self.OwnerRebuildSDK(self.CreatePayload())
@@ -640,8 +634,10 @@ class SMQHostBase(SMQActorBase):
         if self.IsDebugMode:
             print("Rebuild S D K - ")
             print("payload: " + payload)
-            
-        self.RMQChannel.basic_publish(exchange='ownermic', routing_key='host.general.owner.rebuildsdk',  body=payload.toJSON())
+        
+        term = payload.LexiconTerm = Lexicon.TermsByRoutingKey['host.general.owner.rebuildsdk'];
+        self.RMQChannel.basic_publish(exchange=term.Sender + 'mic', routing_key=term.RoutingKey,  body=payload.toJSON())            
+
     
     def OwnerGetFilesNoPayload(self):
         self.OwnerGetFiles(self.CreatePayload())
@@ -657,8 +653,10 @@ class SMQHostBase(SMQActorBase):
         if self.IsDebugMode:
             print("Get Files - ")
             print("payload: " + payload)
-            
-        self.RMQChannel.basic_publish(exchange='ownermic', routing_key='host.general.owner.getfiles',  body=payload.toJSON())
+        
+        term = payload.LexiconTerm = Lexicon.TermsByRoutingKey['host.general.owner.getfiles'];
+        self.RMQChannel.basic_publish(exchange=term.Sender + 'mic', routing_key=term.RoutingKey,  body=payload.toJSON())            
+
     
     def OwnerGetFileNoPayload(self):
         self.OwnerGetFile(self.CreatePayload())
@@ -674,8 +672,10 @@ class SMQHostBase(SMQActorBase):
         if self.IsDebugMode:
             print("Get File - ")
             print("payload: " + payload)
-            
-        self.RMQChannel.basic_publish(exchange='ownermic', routing_key='host.general.owner.getfile',  body=payload.toJSON())
+        
+        term = payload.LexiconTerm = Lexicon.TermsByRoutingKey['host.general.owner.getfile'];
+        self.RMQChannel.basic_publish(exchange=term.Sender + 'mic', routing_key=term.RoutingKey,  body=payload.toJSON())            
+
     
     def OwnerGetModuleInitFileSetNoPayload(self):
         self.OwnerGetModuleInitFileSet(self.CreatePayload())
@@ -691,8 +691,10 @@ class SMQHostBase(SMQActorBase):
         if self.IsDebugMode:
             print("Get Module Init File Set - ")
             print("payload: " + payload)
-            
-        self.RMQChannel.basic_publish(exchange='ownermic', routing_key='host.general.owner.getmoduleinitfileset',  body=payload.toJSON())
+        
+        term = payload.LexiconTerm = Lexicon.TermsByRoutingKey['host.general.owner.getmoduleinitfileset'];
+        self.RMQChannel.basic_publish(exchange=term.Sender + 'mic', routing_key=term.RoutingKey,  body=payload.toJSON())            
+
     
         # And can also say/hear everything which : Public hears.
         
@@ -710,25 +712,27 @@ class SMQHostBase(SMQActorBase):
         if self.IsDebugMode:
             print("Create S M Q Project - ")
             print("payload: " + payload)
-            
-        self.RMQChannel.basic_publish(exchange='publicmic', routing_key='host.general.public.createsmqproject',  body=payload.toJSON())
+        
+        term = payload.LexiconTerm = Lexicon.TermsByRoutingKey['host.general.public.createsmqproject'];
+        self.RMQChannel.basic_publish(exchange=term.Sender + 'mic', routing_key=term.RoutingKey,  body=payload.toJSON())            
+
     
 
                     </FileContents>
 </FileSetFile>
 <FileSetFile>
-<RelativePath>SMQActors/SMQHost.py</RelativePath>
+<RelativePath>SassyMQ/OSTL/SMQActors/SMQHost.py</RelativePath>
 <OverwriteMode>Always</OverwriteMode>
 <FileContents>
-from SMQHostBase import *
+from SassyMQ.OSTL.SMQActors.SMQHostBase import *
 
 class SMQHost(SMQHostBase):
     pass
                     </FileContents>
 </FileSetFile>
 <FileSetFile>
-<RelativePath>OSTLPayload.py</RelativePath>
-<OverwriteMode>Always</OverwriteMode>
+<RelativePath>SassyMQ/OSTL/OSTLPayload.py</RelativePath>
+<OverwriteMode>Never</OverwriteMode>
 <FileContents>
 class OSTLPayload(StandardPayload): 
     pass

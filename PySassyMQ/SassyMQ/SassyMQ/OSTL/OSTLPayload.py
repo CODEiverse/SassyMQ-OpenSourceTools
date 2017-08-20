@@ -1,0 +1,3 @@
+﻿
+class OSTLPayload(StandardPayload): 
+    pass

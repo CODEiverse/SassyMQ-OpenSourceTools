@@ -1,4 +1,4 @@
-
+﻿
 using RabbitMQ.Client;
 using RabbitMQ.Client.Events;
 using RabbitMQ.Client.MessagePatterns;
@@ -18,13 +18,33 @@ namespace SassyMQ.OSTL.Lib.RMQActors
             : base("public.all", isAutoConnect)
         {
         }
-        // OpenSourceToolsLexicon - OSTL
+        // OpenSourceTools - OSTL
         public virtual bool Connect(string virtualHost, string username, string password)
         {
             return base.Connect(virtualHost, username, password);
         }   
 
-        protected override void CheckRouting(OSTLPayload payload) {
+        protected override void CheckRouting(OSTLPayload payload) 
+        {
+            this.CheckRouting(payload, false);
+        }
+
+        partial void CheckPayload(OSTLPayload payload);
+
+        private void Reply(OSTLPayload payload)
+        {
+            if (!System.String.IsNullOrEmpty(payload.ReplyTo))
+            {
+                payload.DirectMessageQueue = this.QueueName;
+                this.CheckPayload(payload);
+                this.RMQChannel.BasicPublish("", payload.ReplyTo, body: Encoding.UTF8.GetBytes(payload.ToJSonString()));
+            }
+        }
+
+        protected override void CheckRouting(OSTLPayload payload, bool isDirectMessage) 
+        {
+            // if (payload.IsDirectMessage && !isDirectMessage) return;
+
             
         }
 
@@ -41,6 +61,7 @@ namespace SassyMQ.OSTL.Lib.RMQActors
 
             public void PublicCreateSMQProject(OSTLPayload payload)
             {
+                
                 this.SendMessage(payload, "Create S M Q Project - ",
                         "publicmic", "host.general.public.createsmqproject");
              }
@@ -48,20 +69,28 @@ namespace SassyMQ.OSTL.Lib.RMQActors
  
         
 
-            private void SendMessage(OSTLPayload payload, string description, string mic, string routingKey)
+        private void SendMessage(OSTLPayload payload, string description, string mic, string routingKey, string directRoutingKey = "")
+        {
+            if (IsDebugMode)
             {
-                if (IsDebugMode)
-                {
-                    System.Console.WriteLine(description);
-                    System.Console.WriteLine("payload: " + payload.SafeToString());
-                }
-
-                IBasicProperties props = this.RMQChannel.CreateBasicProperties();
-                props.ReplyTo = "amq.rabbitmq.reply-to";
-                this.RMQChannel.BasicPublish(mic, routingKey, props, Encoding.UTF8.GetBytes(payload.ToJSonString()));
+                System.Console.WriteLine(description);
+                System.Console.WriteLine("payload: " + payload.SafeToString());
             }
 
-     
+            var finalRoute = payload.RoutingKey = routingKey;
+
+            if (!string.IsNullOrEmpty(directRoutingKey))
+            {
+                finalRoute = directRoutingKey;
+                mic = "";
+            }
+
+            this.ReplyTo += payload.HandleReplyTo;
+
+            IBasicProperties props = this.RMQChannel.CreateBasicProperties();
+            props.ReplyTo = "amq.rabbitmq.reply-to";
+            this.RMQChannel.BasicPublish(mic, finalRoute, props, Encoding.UTF8.GetBytes(payload.ToJSonString()));
+        }
     }
 }
 

@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 
 using System.Linq;
 using System.Collections.Generic;
@@ -9,7 +9,7 @@ namespace SassyMQ.OSTL.Lib.RabbitMQ
 {
     public class LexiconTerm : LexiconTerm<LexiconTermEnum> { }
 
-    public partial class Lexicon
+    public partial class Lexicon  : IEnumerable<LexiconTerm>
     {
         public static Lexicon Terms = new Lexicon();
         protected static new Dictionary<LexiconTermEnum, LexiconTerm> TermsByKey { get; set; }
@@ -26,6 +26,12 @@ namespace SassyMQ.OSTL.Lib.RabbitMQ
 
 
         public IEnumerator<LexiconTerm> GetEnumerator()
+        {
+            return Lexicon.TermsByKey.Values.GetEnumerator();
+        }
+
+        
+        IEnumerator IEnumerable.GetEnumerator()
         {
             return Lexicon.TermsByKey.Values.GetEnumerator();
         }

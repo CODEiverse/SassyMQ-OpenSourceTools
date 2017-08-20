@@ -1,4 +1,4 @@
-
+﻿
 using RabbitMQ.Client;
 using RabbitMQ.Client.Events;
 using RabbitMQ.Client.MessagePatterns;
@@ -18,84 +18,80 @@ namespace SassyMQ.OSTL.Lib.RMQActors
             : base("host.all", isAutoConnect)
         {
         }
-        // OpenSourceToolsLexicon - OSTL
+        // OpenSourceTools - OSTL
         public virtual bool Connect(string virtualHost, string username, string password)
         {
             return base.Connect(virtualHost, username, password);
         }   
 
-        protected override void CheckRouting(OSTLPayload payload) {
+        protected override void CheckRouting(OSTLPayload payload) 
+        {
+            this.CheckRouting(payload, false);
+        }
+
+        partial void CheckPayload(OSTLPayload payload);
+
+        private void Reply(OSTLPayload payload)
+        {
+            if (!System.String.IsNullOrEmpty(payload.ReplyTo))
+            {
+                payload.DirectMessageQueue = this.QueueName;
+                this.CheckPayload(payload);
+                this.RMQChannel.BasicPublish("", payload.ReplyTo, body: Encoding.UTF8.GetBytes(payload.ToJSonString()));
+            }
+        }
+
+        protected override void CheckRouting(OSTLPayload payload, bool isDirectMessage) 
+        {
+            // if (payload.IsDirectMessage && !isDirectMessage) return;
+
             
              if (payload.IsLexiconTerm(LexiconTermEnum.public_createsmqproject_host)) 
             {
                 this.OnPublicCreateSMQProjectReceived(payload);
-                if (!System.String.IsNullOrEmpty(payload.ReplyTo)) 
-                {
-                    this.RMQChannel.BasicPublish("", payload.ReplyTo, body: Encoding.UTF8.GetBytes(payload.ToJSonString()));
-                }
+                this.Reply(payload);
             }
         
             else  if (payload.IsLexiconTerm(LexiconTermEnum.owner_takeownership_host)) 
             {
                 this.OnOwnerTakeOwnershipReceived(payload);
-                if (!System.String.IsNullOrEmpty(payload.ReplyTo)) 
-                {
-                    this.RMQChannel.BasicPublish("", payload.ReplyTo, body: Encoding.UTF8.GetBytes(payload.ToJSonString()));
-                }
+                this.Reply(payload);
             }
         
             else  if (payload.IsLexiconTerm(LexiconTermEnum.owner_setsource_host)) 
             {
                 this.OnOwnerSetSourceReceived(payload);
-                if (!System.String.IsNullOrEmpty(payload.ReplyTo)) 
-                {
-                    this.RMQChannel.BasicPublish("", payload.ReplyTo, body: Encoding.UTF8.GetBytes(payload.ToJSonString()));
-                }
+                this.Reply(payload);
             }
         
             else  if (payload.IsLexiconTerm(LexiconTermEnum.owner_getsdk_host)) 
             {
                 this.OnOwnerGetSDKReceived(payload);
-                if (!System.String.IsNullOrEmpty(payload.ReplyTo)) 
-                {
-                    this.RMQChannel.BasicPublish("", payload.ReplyTo, body: Encoding.UTF8.GetBytes(payload.ToJSonString()));
-                }
+                this.Reply(payload);
             }
         
             else  if (payload.IsLexiconTerm(LexiconTermEnum.owner_rebuildsdk_host)) 
             {
                 this.OnOwnerRebuildSDKReceived(payload);
-                if (!System.String.IsNullOrEmpty(payload.ReplyTo)) 
-                {
-                    this.RMQChannel.BasicPublish("", payload.ReplyTo, body: Encoding.UTF8.GetBytes(payload.ToJSonString()));
-                }
+                this.Reply(payload);
             }
         
             else  if (payload.IsLexiconTerm(LexiconTermEnum.owner_getfiles_host)) 
             {
                 this.OnOwnerGetFilesReceived(payload);
-                if (!System.String.IsNullOrEmpty(payload.ReplyTo)) 
-                {
-                    this.RMQChannel.BasicPublish("", payload.ReplyTo, body: Encoding.UTF8.GetBytes(payload.ToJSonString()));
-                }
+                this.Reply(payload);
             }
         
             else  if (payload.IsLexiconTerm(LexiconTermEnum.owner_getfile_host)) 
             {
                 this.OnOwnerGetFileReceived(payload);
-                if (!System.String.IsNullOrEmpty(payload.ReplyTo)) 
-                {
-                    this.RMQChannel.BasicPublish("", payload.ReplyTo, body: Encoding.UTF8.GetBytes(payload.ToJSonString()));
-                }
+                this.Reply(payload);
             }
         
             else  if (payload.IsLexiconTerm(LexiconTermEnum.owner_getmoduleinitfileset_host)) 
             {
                 this.OnOwnerGetModuleInitFileSetReceived(payload);
-                if (!System.String.IsNullOrEmpty(payload.ReplyTo)) 
-                {
-                    this.RMQChannel.BasicPublish("", payload.ReplyTo, body: Encoding.UTF8.GetBytes(payload.ToJSonString()));
-                }
+                this.Reply(payload);
             }
         
             // And can also hear everything which : Owner hears.
@@ -223,6 +219,7 @@ namespace SassyMQ.OSTL.Lib.RMQActors
 
             public void OwnerTakeOwnership(OSTLPayload payload)
             {
+                
                 this.SendMessage(payload, "Take Ownership - ",
                         "ownermic", "host.general.owner.takeownership");
              }
@@ -241,6 +238,7 @@ namespace SassyMQ.OSTL.Lib.RMQActors
 
             public void OwnerSetSource(OSTLPayload payload)
             {
+                
                 this.SendMessage(payload, "Set Source - ",
                         "ownermic", "host.general.owner.setsource");
              }
@@ -259,6 +257,7 @@ namespace SassyMQ.OSTL.Lib.RMQActors
 
             public void OwnerGetSDK(OSTLPayload payload)
             {
+                
                 this.SendMessage(payload, "Get S D K - ",
                         "ownermic", "host.general.owner.getsdk");
              }
@@ -277,6 +276,7 @@ namespace SassyMQ.OSTL.Lib.RMQActors
 
             public void OwnerRebuildSDK(OSTLPayload payload)
             {
+                
                 this.SendMessage(payload, "Rebuild S D K - ",
                         "ownermic", "host.general.owner.rebuildsdk");
              }
@@ -295,6 +295,7 @@ namespace SassyMQ.OSTL.Lib.RMQActors
 
             public void OwnerGetFiles(OSTLPayload payload)
             {
+                
                 this.SendMessage(payload, "Get Files - ",
                         "ownermic", "host.general.owner.getfiles");
              }
@@ -313,6 +314,7 @@ namespace SassyMQ.OSTL.Lib.RMQActors
 
             public void OwnerGetFile(OSTLPayload payload)
             {
+                
                 this.SendMessage(payload, "Get File - ",
                         "ownermic", "host.general.owner.getfile");
              }
@@ -331,6 +333,7 @@ namespace SassyMQ.OSTL.Lib.RMQActors
 
             public void OwnerGetModuleInitFileSet(OSTLPayload payload)
             {
+                
                 this.SendMessage(payload, "Get Module Init File Set - ",
                         "ownermic", "host.general.owner.getmoduleinitfileset");
              }
@@ -351,6 +354,7 @@ namespace SassyMQ.OSTL.Lib.RMQActors
 
             public void PublicCreateSMQProject(OSTLPayload payload)
             {
+                
                 this.SendMessage(payload, "Create S M Q Project - ",
                         "publicmic", "host.general.public.createsmqproject");
              }
@@ -358,20 +362,28 @@ namespace SassyMQ.OSTL.Lib.RMQActors
  
         
 
-            private void SendMessage(OSTLPayload payload, string description, string mic, string routingKey)
+        private void SendMessage(OSTLPayload payload, string description, string mic, string routingKey, string directRoutingKey = "")
+        {
+            if (IsDebugMode)
             {
-                if (IsDebugMode)
-                {
-                    System.Console.WriteLine(description);
-                    System.Console.WriteLine("payload: " + payload.SafeToString());
-                }
-
-                IBasicProperties props = this.RMQChannel.CreateBasicProperties();
-                props.ReplyTo = "amq.rabbitmq.reply-to";
-                this.RMQChannel.BasicPublish(mic, routingKey, props, Encoding.UTF8.GetBytes(payload.ToJSonString()));
+                System.Console.WriteLine(description);
+                System.Console.WriteLine("payload: " + payload.SafeToString());
             }
 
-     
+            var finalRoute = payload.RoutingKey = routingKey;
+
+            if (!string.IsNullOrEmpty(directRoutingKey))
+            {
+                finalRoute = directRoutingKey;
+                mic = "";
+            }
+
+            this.ReplyTo += payload.HandleReplyTo;
+
+            IBasicProperties props = this.RMQChannel.CreateBasicProperties();
+            props.ReplyTo = "amq.rabbitmq.reply-to";
+            this.RMQChannel.BasicPublish(mic, finalRoute, props, Encoding.UTF8.GetBytes(payload.ToJSonString()));
+        }
     }
 }
 

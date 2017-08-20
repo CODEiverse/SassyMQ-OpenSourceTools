@@ -7,10 +7,13 @@ using System.Collections.Generic;
 using System.Configuration;
 using System.Linq;
 using System.Text;
-using System.Threading;
 using System.Threading.Tasks;
 using System.Web;
 using System.Windows.Forms;
+using System.IO;
+using Newtonsoft.Json;
+using System.Threading;
+
 
 namespace SassyMQ.Lib.RabbitMQ.Payload
 {
@@ -20,8 +23,8 @@ namespace SassyMQ.Lib.RabbitMQ.Payload
     public abstract class SMQActorBase<T>
         where T : StandardPayload<T>, new()
     {
-        protected IModel RMQChannel;
-        protected IConnection RMQConnection;
+        public IModel RMQChannel;
+        public IConnection RMQConnection;
         protected ConnectionFactory RMQFactory;
         public bool IsConnected { get; protected set; }
         public Task MonitorTask { get; private set; }
@@ -37,6 +40,22 @@ namespace SassyMQ.Lib.RabbitMQ.Payload
         public bool IsAutoConnect { get; set; }
         public static bool IsDebugMode { get; private set; }
         public static bool ShowPings { get; private set; }
+
+        public void WaitForComplete(int timeout = -1)
+        {
+            var actorWaitTask = Task.Factory.StartNew(() =>
+            {
+                while (this.RMQChannel.IsOpen)
+                {
+                    Thread.Sleep(500);
+                }
+            });
+
+            if (timeout == -1) actorWaitTask.Wait();
+            else actorWaitTask.Wait(timeout);
+
+            this.Disconnect();
+        }
 
         public SMQActorBase(String allExchange, bool isAutoConnect)
         {
@@ -184,6 +203,7 @@ namespace SassyMQ.Lib.RabbitMQ.Payload
         }
 
         protected abstract void CheckRouting(T payload);
+        protected abstract void CheckRouting(T payload, bool isDirectMessage);
 
         private void Consumer_Received(object sender, BasicDeliverEventArgs e)
         {
