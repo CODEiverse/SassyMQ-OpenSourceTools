@@ -205,29 +205,6 @@ namespace SassyMQ.OSTL.Lib.RMQActors
 
  
         
-
-        private void SendMessage(OSTLPayload payload, string description, string mic, string routingKey, string directRoutingKey = "")
-        {
-            if (IsDebugMode)
-            {
-                System.Console.WriteLine(description);
-                System.Console.WriteLine("payload: " + payload.SafeToString());
-            }
-
-            var finalRoute = payload.RoutingKey = routingKey;
-
-            if (!string.IsNullOrEmpty(directRoutingKey))
-            {
-                finalRoute = directRoutingKey;
-                mic = "";
-            }
-
-            this.ReplyTo += payload.HandleReplyTo;
-
-            IBasicProperties props = this.RMQChannel.CreateBasicProperties();
-            props.ReplyTo = "amq.rabbitmq.reply-to";
-            this.RMQChannel.BasicPublish(mic, finalRoute, props, Encoding.UTF8.GetBytes(payload.ToJSonString()));
-        }
     }
 }
 
