@@ -7,6 +7,7 @@ using System.Collections.Generic;
 using System.Configuration;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Web;
 using System.Windows.Forms;
@@ -73,12 +74,52 @@ namespace SassyMQ.Lib.RabbitMQ.Payload
             this.VirtualHost = virtualHost;
             this.Username = username;
             this.Password = password;
-            this.RabbitEndpoint = "sassymq.anabstractlevel.com";
+            this.RabbitEndpoint = ConfigurationManager.AppSettings["rmq_endpoint"];
             this.SenderId = Guid.NewGuid();
             if (string.IsNullOrEmpty(this.AllExchange)) throw new ArgumentException("actor.AllExchange property must be assigned before connect can be called.");
             this.AllExchange = this.AllExchange;
 
-            this.RMQFactory = new ConnectionFactory() { HostName = this.RabbitEndpoint, VirtualHost = virtualHost, UserName = username, Password = password };
+            this.AttemptConnect();
+
+
+            this.MonitorTask = new Task(() =>
+            {
+                while (this.IsConnected)
+                {
+                    try
+                    {
+                        if (this.IsConnected && !this.RMQChannel.IsOpen) this.AttemptConnect();
+                        var subscription = new Subscription(RMQChannel, QueueName);
+                        this.MonitorMessages(subscription);
+                        Thread.Sleep(5000);
+                    }
+                    catch (Exception ex)
+                    {
+                        // Ignore errors in this loop
+
+                    }
+                }
+
+                this.RMQChannel.Close();
+                if (this.RMQConnection.IsOpen) this.RMQConnection.Close();
+            });
+
+            this.MonitorTask.Start();
+
+            return true;
+        }
+
+        private void AttemptConnect()
+        {
+            if (!ReferenceEquals(this.RMQChannel, null) && this.RMQChannel.IsOpen)
+            {
+                this.RMQChannel.Close();
+                if (this.RMQConnection.IsOpen) this.RMQConnection.Close();
+                this.RMQChannel = null;
+                this.RMQConnection = null;
+            }
+
+            this.RMQFactory = new ConnectionFactory() { HostName = this.RabbitEndpoint, VirtualHost = this.VirtualHost, UserName = this.Username, Password = this.Password };
             this.RMQConnection = this.RMQFactory.CreateConnection();
             this.RMQChannel = this.RMQConnection.CreateModel();
 
@@ -90,53 +131,42 @@ namespace SassyMQ.Lib.RabbitMQ.Payload
 
             RMQChannel.QueueBind(queue: QueueName, exchange: this.AllExchange, routingKey: "#");
 
+            System.Console.WriteLine("CONNECTED: [*] Waiting for messages. To exit press CTRL+C");
+        }
 
-            System.Console.WriteLine(" [*] Waiting for messages. To exit press CTRL+C");
-
-
-
-            this.MonitorTask = new Task(() =>
+        private void MonitorMessages(Subscription subscription)
+        {
+            int count = 0;
+            while (this.IsConnected && this.RMQChannel.IsOpen)
             {
-                var subscription = new Subscription(RMQChannel, QueueName);
-                int count = 0;
-                while (this.IsConnected)
+                BasicDeliverEventArgs bdea = default(BasicDeliverEventArgs);
+                var gotMessage = subscription.Next(100, out bdea);
+                if (gotMessage)
                 {
-                    BasicDeliverEventArgs bdea = default(BasicDeliverEventArgs);
-                    var gotMessage = subscription.Next(100, out bdea);
-                    if (gotMessage)
-                    {
-                        var msgText = string.Format("{0}{1}. {2} => {3}{0}", Environment.NewLine, ++count, bdea.Exchange, bdea.RoutingKey);
-                        //var msgText = string.Format("{3}. {0}: {1} -> '{2}'", bdea.Exchange, bdea.RoutingKey, Encoding.UTF8.GetString(bdea.Body), ++count);
+                    var msgText = string.Format("{0}{1}. {2} => {3}{0}", Environment.NewLine, ++count, bdea.Exchange, bdea.RoutingKey);
+                    //var msgText = string.Format("{3}. {0}: {1} -> '{2}'", bdea.Exchange, bdea.RoutingKey, Encoding.UTF8.GetString(bdea.Body), ++count);
 
-                        var print = SMQActorBase<T>.IsDebugMode;
+                    var print = SMQActorBase<T>.IsDebugMode;
 
-                        print = print && (!bdea.IsPing() || SMQActorBase<T>.ShowPings);
+                    print = print && (!bdea.IsPing() || SMQActorBase<T>.ShowPings);
 
-                        if (print) System.Console.WriteLine(msgText);
+                    if (print) System.Console.WriteLine(msgText);
 
-                        T payload = StandardPayload<T>.FromJSonString(Encoding.UTF8.GetString(bdea.Body)) as T;
+                    T payload = StandardPayload<T>.FromJSonString(Encoding.UTF8.GetString(bdea.Body)) as T;
 
-                        payload.DeliveryTag = bdea.DeliveryTag.SafeToString();
-                        payload.RoutingKey = bdea.RoutingKey;
-                        payload.ReplyTo = bdea.BasicProperties.ReplyTo;
-                        payload.Exchange = bdea.Exchange;
+                    payload.DeliveryTag = bdea.DeliveryTag.SafeToString();
+                    payload.RoutingKey = bdea.RoutingKey;
+                    payload.ReplyTo = bdea.BasicProperties.ReplyTo;
+                    payload.Exchange = bdea.Exchange;
 
-                        this.OnMessageReceived(payload);
+                    this.OnMessageReceived(payload);
 
-                        this.CheckRouting(payload);
-                        this.OnAfterMessageReceived(payload);
+                    this.CheckRouting(payload);
+                    this.OnAfterMessageReceived(payload);
 
-                    }
                 }
+            }
 
-                this.RMQChannel.Close();
-                this.RMQConnection.Close();
-            });
-
-            this.MonitorTask.Start();
-
-
-            return true;
         }
 
         public event EventHandler<PayloadEventArgs<T>> MessageReceived;
