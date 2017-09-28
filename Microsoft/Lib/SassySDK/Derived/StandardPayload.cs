@@ -38,9 +38,6 @@ namespace SassyMQ.Lib.RabbitMQ.Payload
         public string RoutingKey { get; set; }
         public String Exchange { get; set; }
         public String ReplyTo { get; set; }
-        public bool IsRejected { get; set; }
-        public string RejectionMsg { get; private set; }
-        public string ResolutionMsg { get; private set; }
         public Exception Exception { get; set; }
         public string ErrorMessage { get; set; }
         public bool IsHandled { get; set; }
@@ -49,18 +46,6 @@ namespace SassyMQ.Lib.RabbitMQ.Payload
         public bool TimedOutWaiting { get; private set; }
         public T ReplyPayload { get; private set; }
         public string DirectMessageQueue { get; set; }
-
-        public void Reject(string msg)
-        {
-            this.IsRejected = true;
-            this.RejectionMsg = msg;
-        }
-
-        public void Resolve(string msg)
-        {
-            this.IsRejected = false;
-            this.ResolutionMsg = msg;
-        }
 
         public string ToJSonString()
         {

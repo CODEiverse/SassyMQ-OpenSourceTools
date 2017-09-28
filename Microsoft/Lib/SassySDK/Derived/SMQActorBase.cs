@@ -99,7 +99,7 @@ namespace SassyMQ.Lib.RabbitMQ.Payload
             this.AllExchange = this.AllExchange;
 
             this.AttemptConnect();
-
+            this.AfterConnect();
 
             this.MonitorTask = new Task(() =>
             {
@@ -171,23 +171,37 @@ namespace SassyMQ.Lib.RabbitMQ.Payload
 
                     if (print) System.Console.WriteLine(msgText);
 
-                    T payload = StandardPayload<T>.FromJSonString(Encoding.UTF8.GetString(bdea.Body)) as T;
+                    var body = Encoding.UTF8.GetString(bdea.Body);
+                    T payload = StandardPayload<T>.FromJSonString(body) as T;
 
                     payload.DeliveryTag = bdea.DeliveryTag.SafeToString();
-                    payload.RoutingKey = bdea.RoutingKey;
+                    if (String.IsNullOrEmpty(payload.RoutingKey)) payload.RoutingKey = bdea.RoutingKey;
                     payload.ReplyTo = bdea.BasicProperties.ReplyTo;
                     payload.Exchange = bdea.Exchange;
 
                     this.OnMessageReceived(payload);
-
-                    this.CheckRouting(payload);
+                    try
+                    {
+                        this.CheckRouting(payload);
+                    }
+                    catch (Exception ex)
+                    {
+                        payload.Exception = ex;
+                    }
                     this.OnAfterMessageReceived(payload);
-
                 }
             }
 
         }
+        internal void ReportException(StandardPayload<T> payload)
+        {
+            this.RMQChannel.BasicPublish("", payload.ReplyTo, null, Encoding.UTF8.GetBytes(payload.ToJSonString()));
+        }
 
+        protected virtual void AfterConnect()
+        {
+            // do nothing
+        }
         public event EventHandler<PayloadEventArgs<T>> MessageReceived;
         protected virtual void OnMessageReceived(T payload)
         {
@@ -240,11 +254,12 @@ namespace SassyMQ.Lib.RabbitMQ.Payload
                     this.HandleInvokeExternal(this, iea);
                 }
                 else methodDelegate.Invoke(methodDelegate.Target, plea);
+                plea.Payload.IsHandled = true;
             }
         }
 
 
-        public T CreatePayload()
+        public virtual T CreatePayload()
         {
             T payload = new T();
             payload.SenderId = this.SenderId.GuidToKey();
